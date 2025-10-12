@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3 uid="uid://3q81aygs8dob"]
+
+[ext_resource type="Script" uid="uid://0cy0qbuhdvy4" path="res://Scripts/Ghostes/inky.gd" id="1_xj5b5"]
+[ext_resource type="Texture2D" uid="uid://ctjkma4002sv6" path="res://Sprites/Ghosts/Inky/Inky01.png" id="2_mmijr"]
+[ext_resource type="Texture2D" uid="uid://vnd034tfpnjy" path="res://Sprites/Ghosts/Inky/Inky02.png" id="3_n5hhx"]
+[ext_resource type="Texture2D" uid="uid://cr4drkb3h8h2s" path="res://icon.svg" id="4_ih4yg"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_svaxu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_mmijr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_n5hhx")
+}],
+"loop": true,
+"name": &"default",
+"speed": 3.0
+}]
+
+[node name="Inky" type="Node2D"]
+scale = Vector2(1.95, 1.75)
+script = ExtResource("1_xj5b5")
+position_scatter_corner = Vector2i(27, 35)
+
+[node name="Body" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_svaxu")
+
+[node name="Eyes" type="Sprite2D" parent="."]
+
+[node name="Mark" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0.209736, 0.252651, 1, 1)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("4_ih4yg")

@@ -1,0 +1,42 @@
+[gd_scene load_steps=7 format=3 uid="uid://bbkdpyy3q6a05"]
+
+[ext_resource type="Texture2D" uid="uid://cmjpj0lnaldit" path="res://Sprites/Ghosts/Blinky/Blinky01.png" id="1_6mhp8"]
+[ext_resource type="Script" uid="uid://btiu32283jxmq" path="res://Scripts/Ghostes/blinky.gd" id="1_fnmpk"]
+[ext_resource type="Texture2D" uid="uid://cyg5umvw1eyw1" path="res://Sprites/Ghosts/Blinky/Blinky02.png" id="2_vi2dm"]
+[ext_resource type="Texture2D" uid="uid://dhrkpfjickyil" path="res://Sprites/Ghosts/Eyes/Left.png" id="4_fnmpk"]
+[ext_resource type="Texture2D" uid="uid://cr4drkb3h8h2s" path="res://icon.svg" id="5_0csxs"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fnmpk"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_6mhp8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_vi2dm")
+}],
+"loop": true,
+"name": &"default",
+"speed": 3.0
+}]
+
+[node name="Blinky" type="Node2D"]
+scale = Vector2(1.95, 1.75)
+script = ExtResource("1_fnmpk")
+position_scatter_corner = Vector2i(25, 2)
+
+[node name="Body" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, 7.62939e-06)
+sprite_frames = SubResource("SpriteFrames_fnmpk")
+autoplay = "default"
+frame_progress = 0.70817
+
+[node name="Eyes" type="Sprite2D" parent="."]
+position = Vector2(0, 7.62939e-06)
+texture = ExtResource("4_fnmpk")
+
+[node name="Mark" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(1, 0, 0, 1)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("5_0csxs")

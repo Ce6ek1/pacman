@@ -1,0 +1,67 @@
+[gd_scene load_steps=4 format=3 uid="uid://b8jsba6vflclr"]
+
+[ext_resource type="Script" uid="uid://w51lhsqnxbx2" path="res://Scripts/Main.gd" id="1_idj7w"]
+[ext_resource type="PackedScene" uid="uid://4w82sdsiqhf0" path="res://Scenes/Maps/Map.tscn" id="1_r150o"]
+[ext_resource type="FontFile" uid="uid://35d53b2vaccp" path="res://Fonts/Vyaz Pixel.ttf" id="3_kln2b"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_idj7w")
+
+[node name="Map" parent="." instance=ExtResource("1_r150o")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchor_left = -0.051
+anchor_top = -0.05
+anchor_right = 1.196
+anchor_bottom = 1.196
+offset_left = -50.016
+offset_top = 65.0
+offset_right = -0.664063
+offset_bottom = -171.68
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Control"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -263.0
+offset_right = 263.0
+offset_bottom = 181.0
+grow_horizontal = 2
+theme_override_constants/separation = 150
+
+[node name="ScoreContainer" type="VBoxContainer" parent="CanvasLayer/Control/HBoxContainer"]
+layout_mode = 2
+
+[node name="Score" type="Label" parent="CanvasLayer/Control/HBoxContainer/ScoreContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_kln2b")
+theme_override_font_sizes/font_size = 58
+text = "Score"
+
+[node name="ScorePoint" type="Label" parent="CanvasLayer/Control/HBoxContainer/ScoreContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_kln2b")
+theme_override_font_sizes/font_size = 58
+text = "9999999"
+
+[node name="HighScoreContainer" type="VBoxContainer" parent="CanvasLayer/Control/HBoxContainer"]
+layout_mode = 2
+
+[node name="HighScore" type="Label" parent="CanvasLayer/Control/HBoxContainer/HighScoreContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_kln2b")
+theme_override_font_sizes/font_size = 58
+text = "High Score"
+
+[node name="HighScorePoint" type="Label" parent="CanvasLayer/Control/HBoxContainer/HighScoreContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_kln2b")
+theme_override_font_sizes/font_size = 58
+text = "999999
+"

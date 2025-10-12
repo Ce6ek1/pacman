@@ -1,0 +1,66 @@
+[gd_scene load_steps=9 format=3 uid="uid://1jx1ae5mloyf"]
+
+[ext_resource type="Script" uid="uid://c2erb5y1ujrrl" path="res://Scripts/PacMan.gd" id="1_ii61d"]
+[ext_resource type="Texture2D" uid="uid://btpy33klf6s6g" path="res://Sprites/PacMan/PacMan01.png" id="1_kc5sr"]
+[ext_resource type="Texture2D" uid="uid://bp5pm4psdp22o" path="res://Sprites/PacMan/PacMan02.png" id="2_31r5v"]
+[ext_resource type="Texture2D" uid="uid://bntxfa3c5n1l4" path="res://Sprites/PacMan/Death01.png" id="2_ty2hs"]
+[ext_resource type="Texture2D" uid="uid://drgrttn0drygb" path="res://Sprites/PacMan/Death02.png" id="3_d83bc"]
+[ext_resource type="Texture2D" uid="uid://bf62171x6t7au" path="res://Sprites/PacMan/PacMan03.png" id="3_vxw4m"]
+[ext_resource type="Texture2D" uid="uid://07hvd5lwct42" path="res://Sprites/PacMan/Death03.png" id="4_ke7j8"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_4e8kq"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_ty2hs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_d83bc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ke7j8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_d83bc")
+}],
+"loop": true,
+"name": &"Death",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_kc5sr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_31r5v")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_vxw4m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_31r5v")
+}],
+"loop": true,
+"name": &"run",
+"speed": 10.0
+}]
+
+[node name="PacMan" type="Node2D"]
+script = ExtResource("1_ii61d")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(1.1, 1.1)
+sprite_frames = SubResource("SpriteFrames_4e8kq")
+animation = &"Death"
+autoplay = "run"
+frame_progress = 0.142888
+
+[node name="AnimationTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[node name="AdditionalTimer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="timeout" from="AnimationTimer" to="." method="_on_animation_timer_timeout"]
+[connection signal="timeout" from="AdditionalTimer" to="." method="_on_additional_timer_timeout"]
