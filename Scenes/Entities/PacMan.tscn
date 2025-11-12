@@ -56,10 +56,11 @@ autoplay = "run"
 frame_progress = 0.142888
 
 [node name="AnimationTimer" type="Timer" parent="."]
-wait_time = 3.0
+wait_time = 1.5
 one_shot = true
 
 [node name="AdditionalTimer" type="Timer" parent="."]
+wait_time = 0.5
 one_shot = true
 
 [connection signal="timeout" from="AnimationTimer" to="." method="_on_animation_timer_timeout"]

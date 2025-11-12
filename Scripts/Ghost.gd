@@ -1,7 +1,7 @@
 class_name Ghost extends Node2D
 
-enum State {SCATTER, CHASE, FRIGHTENED, EATEN, HOUSED} # Разбрасывание, преследование, испуганный, съединый, сидит в доме 
-var current_state = State.SCATTER
+enum State {SCATTER, CHASE, FRIGHTENED, EATEN, HOUSED, EXIT} # Разбрасывание, преследование, испуганный, съединый, сидит в доме 
+var current_state = State.HOUSED
 @export var position_start_tile: Vector2i
 @export var position_scatter_corner: Vector2i
 @export var debug: bool = false
@@ -13,17 +13,25 @@ var current_direction: Vector2i = Vector2i() #Map
 var position_tile_current: Vector2i = Vector2i() #Map
 var position_tile_target: Vector2i = Vector2i() #Map
 var center_of_current_tile: Vector2i = Vector2i() #Global
+const basic_speed: float = 165
 var speed: float = 165
 var possible_direction: Array = []
 var position_tile_next: Vector2i = Vector2i()
+var left_portal = true
+var right_portal = true
+
 
 const EYES_LEFT = preload("res://Sprites/Ghosts/Eyes/Left.png")
 const EYES_RIGHT = preload("res://Sprites/Ghosts/Eyes/Right.png")
 const EYES_DOWN = preload("res://Sprites/Ghosts/Eyes/Down.png")
 const EYES_UP = preload("res://Sprites/Ghosts/Eyes/Up.png")
 const SPECIAL_TILES: Array[Vector2i] = [Vector2i(12, 15), Vector2i(15, 15), Vector2i(15, 27), Vector2i(15, 27)]
+const PORTAL_ARRAY: Array[Vector2i] = [Vector2i(-1, 18)]
 const DIR_ARRAY: Array = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.UP]
 
+
+const LEFT_PORTAL := Vector2i(-3, 18)
+const RIGHT_PORTAL := Vector2i(30, 18)
 
 @onready var mark: Sprite2D = $Mark
 @onready var tile_map: TileMapLayer = $'/root/Main/Map'
@@ -36,7 +44,6 @@ func debug_mode():
 func _ready():
 	create_and_configure_timers()
 
-	global_position = tile_map.map_to_local(position_start_tile)
 	add_to_group('ghosts')
 	add_to_group('entities')
 	if debug:
@@ -53,13 +60,48 @@ func _process(delta):
 		return
 	if Input.is_action_just_pressed('test_1'):
 		current_state = State.CHASE
+		print('CHASE')
 	elif Input.is_action_just_pressed('test_2'):
 		current_state = State.SCATTER
-	set_positions()
+		print('SCATTER')
+	elif Input.is_action_just_pressed('test_3'):
+		current_state = State.HOUSED
+		print('HOUSED')
+	elif Input.is_action_just_pressed('test_4'):
+		current_state = State.EXIT
+		print('EXIT')
+	set_positions()	
 	if is_at_center():
+		if is_at_portal_cells():
+			speed = basic_speed * 0.75
+		else:
+			speed = basic_speed
+		if position_tile_current == RIGHT_PORTAL:
+			global_position = tile_map.map_to_local(LEFT_PORTAL)
+			position_tile_next = position_tile_current + Vector2i(-1, 0)
+			right_portal = true
+		elif position_tile_current == LEFT_PORTAL:
+			global_position = tile_map.map_to_local(RIGHT_PORTAL)
+			position_tile_next = position_tile_current + Vector2i(1, 0)
+			left_portal = true
 		if is_at_turn():
-			position_tile_target = select_position_tile_final_target()
-		position_tile_next = position_tile_current + choose_best_dir()
+			if !(current_state == State.HOUSED) and !(current_state == State.EXIT):
+				position_tile_target = select_position_tile_final_target()
+			elif current_state == State.HOUSED:
+				walk_in_house()
+			elif current_state == State.EXIT:
+				if exit_from_house(delta):
+					return
+		if !is_at_portal_cells():
+			position_tile_next = position_tile_current + choose_best_dir()
+		else:
+			if current_direction == Vector2i.LEFT:
+				position_tile_next = position_tile_current + Vector2i.LEFT
+			else:
+				position_tile_next = position_tile_current + Vector2i.RIGHT
+	move_ghost(delta)
+
+func move_ghost(delta):
 	global_position = global_position.move_toward(tile_map.map_to_local(position_tile_next), speed*delta)
 	change_eye_texture()
 	mark.global_position = tile_map.map_to_local(position_tile_target)
@@ -90,6 +132,10 @@ func is_at_turn():
 		return true
 	return false
 
+func is_at_portal_cells():
+	if tile_map.get_cell_tile_data(position_tile_current).get_custom_data('TELEPORT'):
+		return true
+	return false
 
 func set_positions() -> void:
 	position_tile_current = tile_map.local_to_map(global_position)
@@ -107,6 +153,10 @@ func change_eye_texture():
 		Vector2i.DOWN:
 			eyes.texture = EYES_DOWN
 
+func change_state_to_global():
+	if current_state == State.SCATTER or current_state == State.CHASE:
+		current_state == GameState.current_global_state
+
 func select_position_tile_final_target() : #Map
 	# Код отличается только в State.CHASE
 	match current_state:
@@ -120,10 +170,32 @@ func target_on_chase_state() -> Vector2i:
 	push_error('Change the "chase_target" script in the ', name, "'s code")
 	return Vector2i(10, 10)
 
+func walk_in_house():
+	if position_tile_current == Vector2i(11, 18):
+		position_tile_target = Vector2i(16, 18)
+	elif position_tile_current == Vector2i(16, 18):
+		position_tile_target = Vector2i(11, 18)
+
+func exit_from_house(delta):
+	if position_tile_current == Vector2i(14, 16):
+		current_state = GameState.current_global_state
+		return true
+	if position_tile_current != Vector2i(14, 18) and position_tile_current != Vector2i(14, 17):
+		walk_in_house()
+		return false
+	else:
+		position_tile_target = Vector2i(14, 6)
+		position_tile_next = position_tile_current + Vector2i.UP
+		current_direction = Vector2i.UP
+		move_ghost(delta)
+		return true
+	
+		
+
 func select_possible_direction() -> Array:
 	possible_direction = []
 	for dir in DIR_ARRAY:
-		if !is_wall(position_tile_current + dir) and dir != -current_direction:
+		if !is_wall(position_tile_current + dir) and (dir != -current_direction or current_state == State.HOUSED or current_state == State.EXIT):
 			possible_direction.append(dir)
 	return possible_direction
 
