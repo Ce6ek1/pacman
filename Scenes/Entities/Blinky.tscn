@@ -1,10 +1,12 @@
-[gd_scene load_steps=7 format=3 uid="uid://bbkdpyy3q6a05"]
+[gd_scene load_steps=9 format=3 uid="uid://bbkdpyy3q6a05"]
 
 [ext_resource type="Texture2D" uid="uid://cmjpj0lnaldit" path="res://Sprites/Ghosts/Blinky/Blinky01.png" id="1_6mhp8"]
 [ext_resource type="Script" uid="uid://btiu32283jxmq" path="res://Scripts/Ghostes/blinky.gd" id="1_fnmpk"]
 [ext_resource type="Texture2D" uid="uid://cyg5umvw1eyw1" path="res://Sprites/Ghosts/Blinky/Blinky02.png" id="2_vi2dm"]
 [ext_resource type="Texture2D" uid="uid://dhrkpfjickyil" path="res://Sprites/Ghosts/Eyes/Left.png" id="4_fnmpk"]
+[ext_resource type="Texture2D" uid="uid://duiepc3ld87i" path="res://Sprites/Ghosts/Spooked/Spooked01.png" id="4_xrswy"]
 [ext_resource type="Texture2D" uid="uid://cr4drkb3h8h2s" path="res://icon.svg" id="5_0csxs"]
+[ext_resource type="Texture2D" uid="uid://c3irbcc3jak47" path="res://Sprites/Ghosts/Spooked/Spooked02.png" id="5_ebr28"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_fnmpk"]
 animations = [{
@@ -16,7 +18,18 @@ animations = [{
 "texture": ExtResource("2_vi2dm")
 }],
 "loop": true,
-"name": &"default",
+"name": &"Basic",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_xrswy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_ebr28")
+}],
+"loop": true,
+"name": &"Spook",
 "speed": 3.0
 }]
 
@@ -28,8 +41,8 @@ position_scatter_corner = Vector2i(25, 2)
 [node name="Body" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, 7.62939e-06)
 sprite_frames = SubResource("SpriteFrames_fnmpk")
-autoplay = "default"
-frame_progress = 0.70817
+animation = &"Basic"
+autoplay = "Basic"
 
 [node name="Eyes" type="Sprite2D" parent="."]
 position = Vector2(0, 7.62939e-06)

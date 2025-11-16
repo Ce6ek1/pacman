@@ -10,13 +10,13 @@ var position_tile_next: Vector2i #Map
 var bufferng_direction: Vector2i #Map
 var center_of_current_tile: Vector2i #Global
 var speed: float = 175
-var ghost_array: Array
 
 @onready var main: Node2D = $"../../"
 @onready var animation_timer:= $AnimationTimer
 @onready var additional_timer:= $AdditionalTimer
 @onready var tile_map: TileMapLayer = $/root/Main/Map
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var win: Label = $/root/Main/CanvasLayer/Score/WIN
 
 func _process(delta):
 	# Определяем позицию ПакМена
@@ -50,16 +50,20 @@ func _process(delta):
 		position_tile_next = position_tile_current + current_direction
 	move(delta)
 	sprite.play()
-	
-
 
 
 func _ready():
+	GameState.game_win.connect(_win_game)
 	add_to_group('pacman')
 	add_to_group('entities')
 	# Выравниваем ПакМена ровно по клетке спавна.
 	position_tile_current = tile_map.local_to_map(global_position)
 	global_position = tile_map.map_to_local(position_tile_current)
+
+func _win_game():
+	win.visible = true
+	set_process(false)
+	
 
 func is_at_center() -> bool:
 	if global_position.distance_to(center_of_current_tile) < 2:
@@ -92,15 +96,28 @@ func move(multiplier):
 func check_tile():
 	for ghost in get_tree().get_nodes_in_group('ghosts'):
 		if ghost.position_tile_current == position_tile_current:
-			get_tree().call_group('entities', 'respawn')
+			if ghost.current_state != ghost.State.EATEN:
+				if ghost.current_state == ghost.State.SPOOK:
+					ghost.die()
+					GameState.score += 250
+				else:
+					get_tree().call_group('entities', 'respawn')
 	var _data = tile_map.get_cell_tile_data(position_tile_current)
 	if _data:
 		if _data.get_custom_data('POINT'):
+			GameState.check_for_win()
 			GameState.score += 10
+			GameState.collected_points += 1
 			tile_map.set_cell(position_tile_current, 4, Vector2i(0, 6), 0)
 		if _data.get_custom_data('ENERGIZER'):
+			GameState.check_for_win()
 			GameState.score += 50
+			GameState.collected_points += 1
+			GameState.scare_ghost()
 			tile_map.set_cell(position_tile_current, 4, Vector2i(0, 6), 0)
+			for ghost in get_tree().get_nodes_in_group('ghosts'):
+				if not (ghost.current_state == ghost.State.EATEN or ghost.current_state == ghost.State.HOUSED or ghost.current_state == ghost.State.EXIT):
+					ghost.current_state = ghost.State.SPOOK
 		if _data.get_custom_data('TELEPORT'):
 			process_stop = true
 		else:

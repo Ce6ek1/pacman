@@ -5,8 +5,8 @@
 [ext_resource type="PackedScene" uid="uid://1jx1ae5mloyf" path="res://Scenes/Entities/PacMan.tscn" id="3_1ayp6"]
 [ext_resource type="PackedScene" uid="uid://bbkdpyy3q6a05" path="res://Scenes/Entities/Blinky.tscn" id="3_c3nwc"]
 [ext_resource type="PackedScene" uid="uid://dl5r34pbnjbdl" path="res://Scenes/Entities/Pinky.tscn" id="5_yi4gh"]
-[ext_resource type="PackedScene" uid="uid://3q81aygs8dob" path="res://Scenes/Entities/inky.tscn" id="6_m07rm"]
-[ext_resource type="PackedScene" uid="uid://chrj4xax4x3ko" path="res://Scenes/Entities/clyde.tscn" id="7_b6kcm"]
+[ext_resource type="PackedScene" uid="uid://3q81aygs8dob" path="res://Scenes/Entities/Inky.tscn" id="6_m07rm"]
+[ext_resource type="PackedScene" uid="uid://chrj4xax4x3ko" path="res://Scenes/Entities/Clyde.tscn" id="7_b6kcm"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_03u5j"]
 texture = ExtResource("1_d78u7")
@@ -394,25 +394,21 @@ position = Vector2(450, 621)
 zoom = Vector2(0.8, 0.8)
 
 [node name="PacMan" parent="." instance=ExtResource("3_1ayp6")]
-position = Vector2(212, 586)
+position = Vector2(439, 690)
 
 [node name="Blinky" parent="." instance=ExtResource("3_c3nwc")]
 position = Vector2(395, 596)
-position_start_tile = Vector2i(13, 15)
 paused = false
 
 [node name="Pinky" parent="." instance=ExtResource("5_yi4gh")]
 position = Vector2(409, 587)
-position_start_tile = Vector2i(13, 15)
 paused = false
 
 [node name="Inky" parent="." instance=ExtResource("6_m07rm")]
 position = Vector2(506, 589)
-position_start_tile = Vector2i(15, 15)
 paused = false
 
 [node name="Clyde" parent="." instance=ExtResource("7_b6kcm")]
 position = Vector2(518, 581)
-position_start_tile = Vector2i(11, 15)
 position_scatter_corner = Vector2i(0, 35)
 paused = false

@@ -1,12 +1,12 @@
 class_name Ghost extends Node2D
 
-enum State {SCATTER, CHASE, FRIGHTENED, EATEN, HOUSED, EXIT} # Разбрасывание, преследование, испуганный, съединый, сидит в доме 
+enum State {SCATTER, CHASE, SPOOK, EATEN, HOUSED, EXIT} # Разбрасывание, преследование, испуганный, съединый, сидит в доме 
 var current_state = State.HOUSED
-@export var position_start_tile: Vector2i
 @export var position_scatter_corner: Vector2i
 @export var debug: bool = false
 @export var paused: bool = true
 
+var position_start_tile: Vector2i
 var timer := Timer.new()
 var additional_timer := Timer.new()
 var current_direction: Vector2i = Vector2i() #Map
@@ -20,7 +20,6 @@ var position_tile_next: Vector2i = Vector2i()
 var left_portal = true
 var right_portal = true
 
-
 const EYES_LEFT = preload("res://Sprites/Ghosts/Eyes/Left.png")
 const EYES_RIGHT = preload("res://Sprites/Ghosts/Eyes/Right.png")
 const EYES_DOWN = preload("res://Sprites/Ghosts/Eyes/Down.png")
@@ -33,17 +32,19 @@ const DIR_ARRAY: Array = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.DOWN, Vector2i
 const LEFT_PORTAL := Vector2i(-3, 18)
 const RIGHT_PORTAL := Vector2i(30, 18)
 
-@onready var mark: Sprite2D = $Mark
 @onready var tile_map: TileMapLayer = $'/root/Main/Map'
 @onready var pac_man: Node2D = $'/root/Main/Map/PacMan'
 @onready var eyes: Sprite2D = $Eyes
+@onready var body: AnimatedSprite2D = $Body
+@onready var mark: Sprite2D = $Mark
+
 
 func debug_mode():
 	mark.visible = true
 
 func _ready():
+	setting()
 	create_and_configure_timers()
-
 	add_to_group('ghosts')
 	add_to_group('entities')
 	if debug:
@@ -51,31 +52,56 @@ func _ready():
 	eyes.scale = Vector2(1.15, 1.15)
 	position_tile_current = tile_map.local_to_map(global_position)
 	global_position = tile_map.map_to_local(position_tile_current)
+	GameState.game_event.connect(_select_signal)
+	GameState.game_win.connect(_win_game)
 
+func _win_game():
+	set_process(false)
+
+func setting():
+	if name == 'Pinky':
+		position_start_tile = Vector2i(13, 18)
+	elif name == 'Inky':
+		position_start_tile = Vector2i(14, 18)
+	elif name == 'Clyde':
+		position_start_tile = Vector2i(15, 18)
+	elif name == 'Blinky':
+		position_start_tile = Vector2i(14, 15)
 func _process(delta):
 	if paused:
 		#if exit_conditon():
 			#paused = false
 			#go_to_exit()
 		return
-	if Input.is_action_just_pressed('test_1'):
-		current_state = State.CHASE
-		print('CHASE')
-	elif Input.is_action_just_pressed('test_2'):
-		current_state = State.SCATTER
-		print('SCATTER')
-	elif Input.is_action_just_pressed('test_3'):
-		current_state = State.HOUSED
-		print('HOUSED')
-	elif Input.is_action_just_pressed('test_4'):
-		current_state = State.EXIT
-		print('EXIT')
+	#if Input.is_action_just_pressed('test_1'):
+		#current_state = State.CHASE
+		#print('CHASE')
+	#elif Input.is_action_just_pressed('test_2'):
+		#current_state = State.SCATTER
+		#print('SCATTER')
+	#elif Input.is_action_just_pressed('test_3'):
+		#current_state = State.HOUSED
+		#print('HOUSED')
+	#elif Input.is_action_just_pressed('test_4'):
+		#current_state = State.EXIT
+		#print('EXIT')
 	set_positions()	
 	if is_at_center():
-		if is_at_portal_cells():
+		if current_state == State.EATEN:
+			speed = basic_speed * 3
+			body.visible = false
+			eyes.visible = true
+		elif current_state == State.SPOOK:
+			speed = basic_speed * 0.7
+			eyes.visible = false
+			body.set_animation('Spook')
+		elif is_at_portal_cells():
 			speed = basic_speed * 0.75
 		else:
 			speed = basic_speed
+			body.set_animation('Basic')
+			body.visible = true
+			eyes.visible = true
 		if position_tile_current == RIGHT_PORTAL:
 			global_position = tile_map.map_to_local(LEFT_PORTAL)
 			position_tile_next = position_tile_current + Vector2i(-1, 0)
@@ -85,13 +111,22 @@ func _process(delta):
 			position_tile_next = position_tile_current + Vector2i(1, 0)
 			left_portal = true
 		if is_at_turn():
-			if !(current_state == State.HOUSED) and !(current_state == State.EXIT):
+			if !(current_state == State.HOUSED) and !(current_state == State.EXIT) and !(current_state == State.EATEN):
 				position_tile_target = select_position_tile_final_target()
 			elif current_state == State.HOUSED:
-				walk_in_house()
+				walk_at_house()
+				if can_release_the_ghosts():
+					release_the_ghost()
+				
+				
 			elif current_state == State.EXIT:
 				if exit_from_house(delta):
 					return
+			elif current_state == State.EATEN:
+				if position_tile_current in [Vector2i(14, 15), Vector2i(14,16), Vector2i(14, 17), Vector2i(14, 18)]:
+					walk_in_house(delta)
+					return
+				position_tile_target = select_position_tile_final_target()
 		if !is_at_portal_cells():
 			position_tile_next = position_tile_current + choose_best_dir()
 		else:
@@ -137,6 +172,9 @@ func is_at_portal_cells():
 		return true
 	return false
 
+func die():
+	current_state = State.EATEN
+
 func set_positions() -> void:
 	position_tile_current = tile_map.local_to_map(global_position)
 	center_of_current_tile = tile_map.map_to_local(position_tile_current)
@@ -153,9 +191,19 @@ func change_eye_texture():
 		Vector2i.DOWN:
 			eyes.texture = EYES_DOWN
 
+func _select_signal(data):
+	if data == 'from_spook_to_normal':
+		change_to_normal_from_spook()
+	if data == 'change_state':
+		change_state_to_global()
+
 func change_state_to_global():
 	if current_state == State.SCATTER or current_state == State.CHASE:
-		current_state == GameState.current_global_state
+		current_state = GameState.current_global_state
+
+func change_to_normal_from_spook():
+	if current_state == State.SPOOK:
+		current_state = GameState.current_global_state
 
 func select_position_tile_final_target() : #Map
 	# Код отличается только в State.CHASE
@@ -164,27 +212,47 @@ func select_position_tile_final_target() : #Map
 			return target_on_chase_state()
 		State.SCATTER: # Разбегание
 			return position_scatter_corner
+		State.SPOOK: # Страх
+			return target_on_spook_state()
+		State.EATEN:
+			return target_on_eaten_state()
 
 # Всегда разное у разных приведений
 func target_on_chase_state() -> Vector2i:
 	push_error('Change the "chase_target" script in the ', name, "'s code")
 	return Vector2i(10, 10)
 
-func walk_in_house():
+func target_on_spook_state() -> Vector2i:
+	push_error('Change the "spook_target" script in the ', name, "'s code")
+	return Vector2i(10, 10)
+
+func target_on_eaten_state() -> Vector2i:
+	return Vector2i(14, 16)
+
+func walk_at_house():
 	if position_tile_current == Vector2i(11, 18):
 		position_tile_target = Vector2i(16, 18)
 	elif position_tile_current == Vector2i(16, 18):
 		position_tile_target = Vector2i(11, 18)
+
+func walk_in_house(delta):
+	position_tile_target = Vector2i(14, 18)
+	if position_tile_current == Vector2i(14, 18):
+		current_state = State.EXIT
+		return
+	position_tile_next = position_tile_current + Vector2i.DOWN
+	current_direction = Vector2i.DOWN
+	move_ghost(delta)
 
 func exit_from_house(delta):
 	if position_tile_current == Vector2i(14, 16):
 		current_state = GameState.current_global_state
 		return true
 	if position_tile_current != Vector2i(14, 18) and position_tile_current != Vector2i(14, 17):
-		walk_in_house()
+		walk_at_house()
 		return false
 	else:
-		position_tile_target = Vector2i(14, 6)
+		position_tile_target = Vector2i(14, 15)
 		position_tile_next = position_tile_current + Vector2i.UP
 		current_direction = Vector2i.UP
 		move_ghost(delta)
@@ -220,7 +288,10 @@ func respawn():
 	set_process(false)
 	visible = false
 	global_position = tile_map.map_to_local(position_start_tile)
+	print(position_start_tile)
 	position_tile_current = tile_map.local_to_map(global_position)
+	if name != 'Blinky':
+		current_state = State.HOUSED
 	timer.start()
 
 func _on_timer_timeout():
@@ -229,3 +300,11 @@ func _on_timer_timeout():
 
 func _on_additional_timeout():
 	set_process(true)
+
+func can_release_the_ghosts():
+		push_error('Change the "can_release_the_ghosts" script in the ', name, "'s code")
+
+
+func release_the_ghost():
+	current_state = State.EXIT
+	

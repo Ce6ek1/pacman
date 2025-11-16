@@ -1,9 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://dl5r34pbnjbdl"]
+[gd_scene load_steps=8 format=3 uid="uid://dl5r34pbnjbdl"]
 
 [ext_resource type="Script" uid="uid://bd3tvffvo8vuq" path="res://Scripts/Ghostes/pinky.gd" id="1_ndaky"]
 [ext_resource type="Texture2D" uid="uid://dqcx5d4qs74a3" path="res://Sprites/Ghosts/Pinky/Pinky01.png" id="1_x45ne"]
 [ext_resource type="Texture2D" uid="uid://sd21tqw7xvg" path="res://Sprites/Ghosts/Pinky/Pinky02.png" id="2_ndaky"]
 [ext_resource type="Texture2D" uid="uid://cr4drkb3h8h2s" path="res://icon.svg" id="4_2eoh7"]
+[ext_resource type="Texture2D" uid="uid://duiepc3ld87i" path="res://Sprites/Ghosts/Spooked/Spooked01.png" id="4_2s4wm"]
+[ext_resource type="Texture2D" uid="uid://c3irbcc3jak47" path="res://Sprites/Ghosts/Spooked/Spooked02.png" id="5_doy24"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_2eoh7"]
 animations = [{
@@ -15,19 +17,29 @@ animations = [{
 "texture": ExtResource("2_ndaky")
 }],
 "loop": true,
-"name": &"new_animation",
+"name": &"Basic",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_2s4wm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_doy24")
+}],
+"loop": true,
+"name": &"Spook",
 "speed": 3.0
 }]
 
 [node name="Pinky" type="Node2D"]
 scale = Vector2(1.95, 1.75)
 script = ExtResource("1_ndaky")
-position_start_tile = Vector2i(13, 18)
 position_scatter_corner = Vector2i(2, 2)
 
 [node name="Body" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_2eoh7")
-animation = &"new_animation"
+animation = &"Basic"
 
 [node name="Eyes" type="Sprite2D" parent="."]
 

@@ -1,30 +1,44 @@
-[gd_scene load_steps=6 format=3 uid="uid://chrj4xax4x3ko"]
+[gd_scene load_steps=8 format=3 uid="uid://chrj4xax4x3ko"]
 
-[ext_resource type="Texture2D" uid="uid://2bxd0bi8r2yk" path="res://Sprites/Ghosts/Clyde/Clyde01.png" id="1_cuief"]
-[ext_resource type="Script" uid="uid://xqfst63dod6g" path="res://Scripts/Ghostes/clyde.gd" id="1_iebm8"]
-[ext_resource type="Texture2D" uid="uid://c6ei5okyhe6lk" path="res://Sprites/Ghosts/Clyde/Clyde02.png" id="2_iebm8"]
-[ext_resource type="Texture2D" uid="uid://cr4drkb3h8h2s" path="res://icon.svg" id="4_4ixu6"]
+[ext_resource type="Script" uid="uid://xqfst63dod6g" path="res://Scripts/Ghostes/clyde.gd" id="1_envam"]
+[ext_resource type="Texture2D" uid="uid://2bxd0bi8r2yk" path="res://Sprites/Ghosts/Clyde/Clyde01.png" id="2_yof4n"]
+[ext_resource type="Texture2D" uid="uid://c6ei5okyhe6lk" path="res://Sprites/Ghosts/Clyde/Clyde02.png" id="3_7ws2v"]
+[ext_resource type="Texture2D" uid="uid://duiepc3ld87i" path="res://Sprites/Ghosts/Spooked/Spooked01.png" id="4_s7tio"]
+[ext_resource type="Texture2D" uid="uid://c3irbcc3jak47" path="res://Sprites/Ghosts/Spooked/Spooked02.png" id="5_8pmll"]
+[ext_resource type="Texture2D" uid="uid://cr4drkb3h8h2s" path="res://icon.svg" id="6_3yi4w"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_4ixu6"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("1_cuief")
+"texture": ExtResource("2_yof4n")
 }, {
 "duration": 1.0,
-"texture": ExtResource("2_iebm8")
+"texture": ExtResource("3_7ws2v")
 }],
 "loop": true,
-"name": &"default",
+"name": &"Basic",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_s7tio")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_8pmll")
+}],
+"loop": true,
+"name": &"Spook",
 "speed": 3.0
 }]
 
 [node name="Clyde" type="Node2D"]
 scale = Vector2(1.95, 1.75)
-script = ExtResource("1_iebm8")
+script = ExtResource("1_envam")
 
 [node name="Body" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_4ixu6")
+animation = &"Basic"
 
 [node name="Eyes" type="Sprite2D" parent="."]
 
@@ -32,4 +46,4 @@ sprite_frames = SubResource("SpriteFrames_4ixu6")
 visible = false
 modulate = Color(0.701908, 0.294357, 4.81307e-07, 1)
 scale = Vector2(0.2, 0.2)
-texture = ExtResource("4_4ixu6")
+texture = ExtResource("6_3yi4w")
